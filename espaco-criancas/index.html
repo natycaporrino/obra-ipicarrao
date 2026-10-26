@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}</style>
+<title>Espaço das Crianças</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<style>
+/* Layout: tour viewer — large image stage with plan beside it (stacked under it on phones) */
+:root{
+  --bg:#f6f3ee; --surface:#fffdf9; --ink:#2a2e27; --muted:#6b6f63; --line:#e3ddd2;
+  --sage:#6f8a55; --sage-soft:#e4ead9; --wood:#d9b88a; --room:#efe7da; --room-hi:#cfe0bb; --mute-room:#e8e4dc; --void:#d7d3cb;
+  --f-display:"Bricolage Grotesque",ui-rounded,system-ui,sans-serif;
+  --f-body:"Nunito Sans",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#171a15; --surface:#1f231d; --ink:#ece9e1; --muted:#a3a698; --line:#343a2f;
+  --sage:#9fbd82; --sage-soft:#2c3626; --wood:#8a6c47; --room:#2a2e26; --room-hi:#3e5230; --mute-room:#24271f; --void:#121410; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#171a15; --surface:#1f231d; --ink:#ece9e1; --muted:#a3a698; --line:#343a2f;
+  --sage:#9fbd82; --sage-soft:#2c3626; --wood:#8a6c47; --room:#2a2e26; --room-hi:#3e5230; --mute-room:#24271f; --void:#121410; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding-block:20px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:18px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 20px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(24px,3.4vw,34px);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.sub{color:var(--muted);font-size:13.5px;margin:0}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:minmax(0,1fr)}}
+
+.stage{position:relative;border-radius:14px;overflow:hidden;background:#1d211b;border:1px solid var(--line);aspect-ratio:1586/992;max-width:100%;cursor:grab;touch-action:pan-y;perspective:900px;user-select:none;-webkit-user-select:none}
+.stage.drag{cursor:grabbing}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .5s ease;will-change:transform;pointer-events:none;-webkit-user-drag:none}
+.stage img:not(.on){opacity:0}
+.hint{position:absolute;left:50%;top:14px;translate:-50% 0;background:rgba(32,36,30,.72);color:#fff;border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:600;pointer-events:none;transition:opacity .4s;white-space:nowrap}
+.zoomctl{position:absolute;right:12px;top:12px;display:grid;gap:6px}
+.zoomctl button{width:36px;height:36px;border-radius:9px;border:0;background:rgba(255,253,249,.88);color:#2a2e27;font-size:19px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.nav{position:absolute;top:50%;translate:0 -50%;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,253,249,.88);color:#2a2e27;font-size:22px;line-height:1;cursor:pointer;display:grid;place-items:center;box-shadow:0 2px 10px rgba(0,0,0,.15)}
+.nav.prev{left:12px}.nav.next{right:12px}
+.nav:hover{background:#fff}
+.tag{position:absolute;left:12px;bottom:12px;background:rgba(32,36,30,.72);color:#fff;border-radius:9px;padding:6px 11px;font-size:13px;font-weight:600;backdrop-filter:blur(6px);pointer-events:none}
+.count{position:absolute;right:12px;bottom:12px;background:rgba(32,36,30,.72);color:#fff;border-radius:9px;padding:6px 10px;font-size:12px;font-variant-numeric:tabular-nums;pointer-events:none}
+
+.info{display:grid;gap:4px}
+.info h2{font-family:var(--f-display);font-weight:600;font-size:21px;margin:0}
+.info p{margin:0;color:var(--muted);max-width:65ch}
+
+.thumbs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.thumb{border:2px solid transparent;border-radius:10px;padding:0;overflow:hidden;background:none;cursor:pointer;display:grid;text-align:left;color:var(--ink)}
+.thumb img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block}
+.thumb span{font-size:12.5px;font-weight:600;padding:5px 2px 0}
+.thumb[aria-current="true"]{border-color:var(--sage)}
+.thumb[aria-current="true"] img{outline:3px solid var(--bg);outline-offset:-5px}
+@media (max-width:620px){.thumbs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+aside{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px}
+aside h3{margin:0;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.plan{width:100%;max-width:240px;justify-self:center;display:block}
+@media (max-width:860px){aside{grid-template-columns:150px minmax(0,1fr);align-items:center}.plan{max-width:150px}}
+.plan .r{fill:var(--room);stroke:var(--ink);stroke-width:9;stroke-linejoin:round}
+.plan .m{fill:var(--mute-room);stroke:var(--ink);stroke-width:6;opacity:.85}
+.plan .v{fill:var(--void)}
+.plan .r.hi{fill:var(--room-hi)}
+.plan .r.click{cursor:pointer}
+.plan text{font-family:var(--f-body);font-size:44px;font-weight:700;fill:var(--muted);text-anchor:middle;pointer-events:none}
+.plan .cone{fill:var(--sage);opacity:.32;pointer-events:none;transition:opacity .2s}
+.pin{cursor:pointer}
+.pin circle{fill:var(--surface);stroke:var(--sage);stroke-width:10}
+.pin text{fill:var(--ink);font-size:46px;dominant-baseline:central}
+.pin.on circle{fill:var(--sage)}
+.pin.on text{fill:var(--surface)}
+.pin:focus-visible circle{stroke:var(--ink);stroke-width:14}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+button:focus-visible{outline:3px solid var(--sage);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.stage img{transition:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Espaço das Crianças</h1>
+    <p class="sub">Estudo de ambientação · entre em cada ambiente e arraste para olhar em volta</p>
+  </header>
+
+  <div class="main">
+    <div style="display:grid;gap:14px;min-width:0">
+      <div class="stage" id="stage" aria-live="polite">
+        <img src="multiuso.jpg" alt="Sala multiuso com palco de cortinas, roda de almofadas e o versículo Marcos 10:14 na parede">
+        <img src="corredor.jpg" alt="Corredor de acesso às salinhas, com mural bíblico sobre o painel de nichos e portas decoradas">
+        <img src="maiores.jpg" alt="Sala das crianças maiores com mapa bíblico ilustrado, mesas redondas e banco estofado">
+        <img src="menores.jpg" alt="Sala das crianças menores com mural da arca de Noé, tapete com pufes e estantes de brinquedos">
+        <img src="cozinha.jpg" alt="Cozinha com bancadas em inox, armários amadeirados, fogão industrial com coifa e janelas com vitral">
+        <button class="nav prev" id="prev" aria-label="Ambiente anterior">‹</button>
+        <button class="nav next" id="next" aria-label="Próximo ambiente">›</button>
+        <div class="tag" id="tag"></div>
+        <div class="count" id="count"></div>
+        <div class="hint" id="hint">↔ arraste para olhar em volta</div>
+        <div class="zoomctl"><button id="zin" aria-label="Aproximar">+</button><button id="zout" aria-label="Afastar">−</button></div>
+      </div>
+      <div class="info"><h2 id="t"></h2><p id="d"></p></div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+
+    <aside>
+      <svg class="plan" id="plan" viewBox="80 25 1175 2150" role="img" aria-label="Planta do pavimento com os pontos de vista">
+        <rect class="v" x="1037" y="40" width="188" height="1490"/>
+        <rect class="m" x="110" y="480" width="103" height="1050"/>
+        <rect class="m" x="110" y="1540" width="110" height="215"/>
+        <rect class="m" x="110" y="1767" width="110" height="378"/>
+                <rect class="m" x="890" y="1540" width="335" height="605"/>
+        <rect class="m" x="232" y="1667" width="560" height="128"/>
+        <rect class="m" x="225" y="952" width="567" height="348"/>
+        <rect class="r" data-room="0" x="110" y="55" width="912" height="493"/>
+        <rect class="r" data-room="1" x="804" y="548" width="218" height="982"/>
+        <rect class="r" data-room="2" x="225" y="560" width="567" height="380"/>
+        <rect class="r" data-room="3" x="232" y="1312" width="560" height="343"/>
+        <rect class="r" data-room="4" x="345" y="1795" width="530" height="350"/>
+        <text x="165" y="1030" transform="rotate(-90 165 1030)">ESCADA</text>
+        <text x="508" y="1140">SALA 2</text>
+        
+        <text x="1057" y="1860">ELEV.</text>
+        <g id="cones"></g>
+        <g id="pins"></g>
+      </svg>
+      <div style="display:grid;gap:8px;min-width:0">
+        <h3>Onde você está</h3>
+        <p class="note">O cone verde gira junto quando você olha para os lados. A sala 2 ainda não tem imagem.</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const STOPS=[
+  {nome:'Sala multiuso',tag:'Sala multiuso',desc:'Palco com cortinas e tablado, roda de almofadas sobre tapete redondo, balcão de acolhida com arco-íris e o versículo “Deixai vir a mim as crianças” (Marcos 10:14) na parede do fundo.',x:215,y:500,tx:760,ty:250},
+  {nome:'Corredor de acesso',tag:'Corredor',desc:'Painel de nichos em madeira com mural bíblico contínuo (arca de Noé, Moisés, Daniel). Do lado das salinhas, portas brancas com ilustrações e barrado de folhagens.',x:912,y:600,tx:912,ty:1500},
+  {nome:'Sala das crianças maiores',tag:'Salinha · maiores',desc:'Mapa bíblico ilustrado em toda a parede, mesas redondas com cadeiras verdes, banco estofado com nichos sob as janelas da fachada e cantinho de leitura com pufes.',x:770,y:900,tx:250,ty:690},
+  {nome:'Sala das crianças menores',tag:'Salinha · menores',desc:'Mural com a arca de Noé e Jesus com as crianças, tapete redondo com pufes coloridos, mesinha infantil e estantes baixas com cestos e brinquedos de madeira.',x:770,y:1610,tx:260,ty:1430},
+  {nome:'Cozinha / apoio',tag:'Cozinha',desc:'Bancadas em inox com armários amadeirados, fogão industrial com coifa, geladeira inox e as janelas altas da fachada com vitrais em azul e amarelo.',x:800,y:1840,tx:420,ty:2130}
+];
+const stage=document.getElementById('stage'), imgs=[...stage.querySelectorAll('img')];
+const thumbs=document.getElementById('thumbs'), pinsG=document.getElementById('pins'), conesG=document.getElementById('cones');
+const NS='http://www.w3.org/2000/svg';
+let cur=0;
+
+STOPS.forEach((s,i)=>{
+  const b=document.createElement('button');b.className='thumb';b.id='th'+i;
+  b.innerHTML=`<img src="${imgs[i].getAttribute('src')}" alt=""><span>${s.tag}</span>`;
+  b.addEventListener('click',()=>go(i));thumbs.appendChild(b);
+  const a=Math.atan2(s.ty-s.y,s.tx-s.x),R=330,w=.5;
+  const c=document.createElementNS(NS,'path');
+  c.setAttribute('d',`M${s.x},${s.y} L${s.x+R*Math.cos(a-w)},${s.y+R*Math.sin(a-w)} A${R},${R} 0 0 1 ${s.x+R*Math.cos(a+w)},${s.y+R*Math.sin(a+w)} Z`);
+  c.setAttribute('class','cone');conesG.appendChild(c);
+  const g=document.createElementNS(NS,'g');g.setAttribute('class','pin');g.setAttribute('tabindex','0');g.setAttribute('role','button');g.setAttribute('aria-label',s.nome);
+  g.innerHTML=`<circle cx="${s.x}" cy="${s.y}" r="46"/><text x="${s.x}" y="${s.y+2}">${i+1}</text>`;
+  g.addEventListener('click',()=>go(i));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go(i);}});
+  pinsG.appendChild(g);
+});
+document.querySelectorAll('.plan .r').forEach(r=>{r.classList.add('click');r.addEventListener('click',()=>go(+r.dataset.room));});
+
+// ---- olhar em volta: pan com leve giro de perspectiva; o cone acompanha ----
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let pan=0, tilt=0, zoom=1.35, anim=null, cones=[...conesG.children];
+function coneD(s,off){const a=Math.atan2(s.ty-s.y,s.tx-s.x)+off,R=330,w=.5;
+  return `M${s.x},${s.y} L${s.x+R*Math.cos(a-w)},${s.y+R*Math.sin(a-w)} A${R},${R} 0 0 1 ${s.x+R*Math.cos(a+w)},${s.y+R*Math.sin(a+w)} Z`;}
+function render(){
+  const W=stage.clientWidth,H=stage.clientHeight,mx=(zoom-1)/2*W,my=(zoom-1)/2*H;
+  pan=Math.max(-1,Math.min(1,pan)); tilt=Math.max(-1,Math.min(1,tilt));
+  imgs[cur].style.transform=`translate(${-pan*mx}px,${-tilt*my}px) rotateY(${-pan*6}deg) scale(${zoom})`;
+  cones[cur].setAttribute('d',coneD(STOPS[cur],pan*.55*(zoom-1)/.35));
+}
+function sweep(){ // entrada: aproxima e gira devagar de um lado ao outro
+  cancelAnimationFrame(anim); if(RM){zoom=1.35;pan=0;render();return;}
+  const t0=performance.now(),D=7000;
+  const step=t=>{const k=Math.min(1,(t-t0)/D);
+    zoom=1.06+.29*Math.min(1,k*4)**.5;
+    pan=k<.25?0:Math.sin((k-.25)/.75*Math.PI*2)*.8*(1-(k-.25)/.75*.4); if(k>=1)pan=0;
+    render(); if(k<1)anim=requestAnimationFrame(step);};
+  anim=requestAnimationFrame(step);
+}
+function go(i){
+  cur=(i+STOPS.length)%STOPS.length; tilt=0; pan=0;
+  imgs.forEach((im,k)=>{im.classList.toggle('on',k===cur);if(k!==cur)im.style.transform='scale(1.06)';});
+  [...thumbs.children].forEach((t,k)=>t.setAttribute('aria-current',k===cur));
+  [...pinsG.children].forEach((p,k)=>p.classList.toggle('on',k===cur));
+  cones.forEach((c,k)=>c.style.opacity=k===cur?'.38':'0');
+  document.querySelectorAll('.plan .r').forEach(r=>r.classList.toggle('hi',+r.dataset.room===cur));
+  const s=STOPS[cur];
+  document.getElementById('t').textContent=s.nome; document.getElementById('d').textContent=s.desc;
+  document.getElementById('tag').textContent=s.tag; document.getElementById('count').textContent=`${cur+1} / ${STOPS.length}`;
+  sweep();
+}
+document.getElementById('prev').addEventListener('click',()=>go(cur-1));
+document.getElementById('next').addEventListener('click',()=>go(cur+1));
+document.getElementById('zin').addEventListener('click',()=>{cancelAnimationFrame(anim);zoom=Math.min(2.2,zoom+.25);render();});
+document.getElementById('zout').addEventListener('click',()=>{cancelAnimationFrame(anim);zoom=Math.max(1.12,zoom-.25);render();});
+addEventListener('keydown',e=>{if(e.key==='ArrowRight'){cancelAnimationFrame(anim);pan+=.15;render();}if(e.key==='ArrowLeft'){cancelAnimationFrame(anim);pan-=.15;render();}
+  if(e.key==='PageDown')go(cur+1);if(e.key==='PageUp')go(cur-1);});
+let drag=null; const hint=document.getElementById('hint');
+stage.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;cancelAnimationFrame(anim);drag={x:e.clientX,y:e.clientY,p:pan,t:tilt,touch:e.pointerType!=='mouse'};stage.classList.add('drag');stage.setPointerCapture(e.pointerId);hint.style.opacity=0;});
+stage.addEventListener('pointermove',e=>{if(!drag)return;const W=stage.clientWidth,H=stage.clientHeight;
+  pan=drag.p-(e.clientX-drag.x)/(W*.45); if(!drag.touch)tilt=drag.t-(e.clientY-drag.y)/(H*.45); render();});
+const end=()=>{drag=null;stage.classList.remove('drag');};
+stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
+stage.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(anim);zoom=Math.max(1.12,Math.min(2.2,zoom-e.deltaY*.0015));render();},{passive:false});
+addEventListener('resize',render);
+go(0);
+</script>
+
+</body>
+</html>
